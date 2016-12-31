@@ -82,7 +82,10 @@ def use_neural_network(input_data):
             print('Negative:',input_data)
 
 
+
+
 saver = tf.train.import_meta_graph('model.ckpt.meta')
 
-use_neural_network("He's an idiot and a jerk, I hate him.")
-use_neural_network("This was the best store i've ever seen. You are so successful which makes me happy")
+use_neural_network("He's an idiot and the worst, I hate him.")
+use_neural_network("This was the best store ever seen. You are so successful which makes me happy")
+use_neural_network("I love shoes and ice cream")

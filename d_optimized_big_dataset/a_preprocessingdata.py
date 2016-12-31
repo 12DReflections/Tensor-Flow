@@ -8,8 +8,10 @@ import pandas as pd
 lemmatizer = WordNetLemmatizer()
 
 
+# Pre-Processing data positive/negative categorization for NN
+
 '''
-Pre-Processing data with Pos/Neg only
+Pre-Processing data with Pos/Neg only - ignoring the neutral
 
 polarity 0 = negative. 2 = neutral. 4 = positive.
 id
@@ -39,8 +41,6 @@ def init_process(fin,fout):
 			print(str(e))
 	outfile.close()
 
-init_process('training.1600000.processed.noemoticon.csv','train_set.csv')
-init_process('testdata.manual.2009.06.14.csv','test_set.csv')
 
 
 def create_lexicon(fin):  
@@ -65,7 +65,6 @@ def create_lexicon(fin):
 	with open('lexicon.pickle','wb') as f:
 		pickle.dump(lexicon,f)
 
-create_lexicon('train_set.csv')
 
 
 def convert_to_vec(fin,fout,lexicon_pickle):
@@ -95,7 +94,7 @@ def convert_to_vec(fin,fout,lexicon_pickle):
 
 		print(counter)
 
-convert_to_vec('test_set.csv','processed-test-set.csv','lexicon-2500-2638.pickle')
+
 
 
 def shuffle_data(fin):
@@ -103,8 +102,6 @@ def shuffle_data(fin):
 	df = df.iloc[np.random.permutation(len(df))]
 	print(df.head())
 	df.to_csv('train_set_shuffled.csv', index=False)
-	
-shuffle_data('train_set.csv')
 
 
 def create_test_data_pickle(fin):
@@ -126,5 +123,14 @@ def create_test_data_pickle(fin):
 	print(counter)
 	feature_sets = np.array(feature_sets)
 	labels = np.array(labels)
+
+init_process('training.1600000.processed.noemoticon.csv','train_set.csv')
+init_process('testdata.manual.2009.06.14.csv','test_set.csv')
+
+create_lexicon('train_set.csv')
+
+convert_to_vec('test_set.csv','processed-test-set.csv','lexicon-2500-2638.pickle')
+	
+shuffle_data('train_set.csv')
 
 create_test_data_pickle('processed-test-set.csv')

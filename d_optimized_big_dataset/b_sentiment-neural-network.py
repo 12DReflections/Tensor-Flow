@@ -1,5 +1,16 @@
+import os 
+import tensorflow as tf
+import pickle
+import numpy as np
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+
+# Train and Test NN performance
+
 '''
-Typical operation:
+Train operation:
 input date > weight > hidden layer 1 ( activation function ) > weights > hiddent layer 2... output layer
 
 compare output to intended output > cost function (cross entropy)
@@ -9,13 +20,9 @@ backwards progation of weights
 
 feed forward + backprop = epoch   --aka. cycle to lower cost function
 '''
-import os 
-import tensorflow as tf
-import pickle
-import numpy as np
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
+
+
+
 lemmatizer = WordNetLemmatizer()
 
 n_nodes_hl1 = 500
@@ -110,10 +117,10 @@ def train_neural_network(x):
 def test_neural_network():
     prediction = neural_network_model(x)
     with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
         for epoch in range(hm_epochs):
             try:
-                print("restoring epoch 1")
+                print("Restoring Epoch ", epoch + 1)
                 saver.restore(sess,tf.train.latest_checkpoint('./'))
             except Exception as e:
                 print(str(e))
@@ -142,8 +149,5 @@ def test_neural_network():
 
 saver = tf.train.Saver()
 tf_log = 'tf.log'
-
-#train_neural_network(x)
-
-
+#train_neural_network(x) # uncomment to train
 test_neural_network()
