@@ -1,37 +1,72 @@
-import nltk 
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer #lemmatizer ensures 'nltk.stem' stems to full words 
-import numpy as np
-import random
-import pickle
-from collections import Counter
 
-lemmatizer = WordNetLemmatizer()
-hm_lines = 100000000
+
+import os 
+import pandas 
 
 '''
-Create the Lexicon 'list' from a Language, derived from 'Pos' and 'Neg' files
+The variables that are to be decided by the user are 
+
+Inputs (<TIME>,<OPEN>,<HIGH>,<LOW>,<CLOSE>)
+Outputs (<CLOSE>)
+
+
+Percentage of training data (60%)
+Percentage of testing data (40%)
+
+Date range: Jan 2001 - 30 Nov 2016
 '''
-def create_lexicon(pos,neg):
-	lexicon = []
 
-	for fi in [pos,neg]: # collect all lexicon from file
-		with open(fi, 'r') as f:
-			contents = f.readlines()
-			for l in contents[:hm_lines]:
-				all_words = word_tokenize(l.lower())
-				lexicon += list(all_words)
+def main():
 
-	lexicon = [lemmatizer.lemmatize(i) for i in lexicon] #reduce word lexicon to lemmatized
-	w_counts = Counter(lexicon) # dict of word frequency  {'the:5252, 'and':434, ...}
+	# train_x, train_y, test_x, test_y = create_feature_sets_and_labels('pos.txt', 'neg.txt')
+	# with open('sentiment_set.pickle', 'wb') as f:
+	# 	pickle.dump([train_x, train_y, test_x, test_y], f)
+
+	# dir_path = os.path.dirname(os.path.realpath(__file__))
+	# print(dir_path)
 	
-	l2 = [] # l2 is final lexicon
-	for w in w_counts:
-		#print(w_counts[w])
-		if 1000 > w_counts[w] > 50: # filter out word frequency to high or low, words like 'the, and, of' 
-			l2.append(w)
-	print('My language l2 is length: ', len(l2))
-	return l2
+
+	time_curr, open_curr, high_curr, low_curr, close_curr =	data_input()
+	print(time_curr)
+	
+
+
+	# create_feature_sets_and_labels('pos.txt', 'neg.txt')
+	# create_feature_sets_and_labels()
+	
+
+# Read in data using PANDAS from csv
+def data_input():
+
+	'''
+	Data Example
+	<TICKER>,<DTYYYYMMDD>,<TIME>,<OPEN>,<HIGH>,<LOW>,<CLOSE>,<VOL>
+	AUDJPY,20010102,230100,64.30,64.30,64.30,64.30,4
+	'''
+
+	colnames = ['TICKER', 'DTYYYYMMDD', 'TIME','OPEN','HIGH','LOW','CLOSE', 'VOL']
+
+#	colnames = ['TICKER', 'DATE', 'TIME','OPEN','HIGH','LOW','CLOSE']
+	data = pandas.read_csv('data/test.txt', names=colnames)
+
+	time_curr = data.TIME.tolist()
+	open_curr = data.OPEN.tolist()
+	high_curr = data.HIGH.tolist()
+	low_curr = data.LOW.tolist()
+	close_curr = data.CLOSE.tolist()
+	return time_curr, open_curr, high_curr, low_curr, close_curr
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def sample_handling(sample, lexicon, classification):
@@ -39,9 +74,9 @@ def sample_handling(sample, lexicon, classification):
 	featureset = []
 
 	'''
-		Return classified samples, as a list of the language with [1,0] as [pos, neg] classification
+		Return classified samples, as a list of the language with [1,0] as [end, neg] classification
 
-					    features      pos neg	
+						features	  pos neg	
 		featureset = [
 						[1 0 0 1 1 0], [1 0],
 						[0 1 0 1 0 0], [0 1],
@@ -61,7 +96,7 @@ def sample_handling(sample, lexicon, classification):
 					features[index_value] += 1
 			features = list(features) # make unique
 			featureset.append([features, classification])
-	print('featureset: ', featureset)
+	#print('featureset: ', featureset)
 	return featureset
 
 # Assign "pos/neg" to training Train and Test
@@ -92,6 +127,4 @@ def create_feature_sets_and_labels(pos,neg,test_size=0.1):
 	return train_x, train_y, test_x, test_y
 
 if __name__=='__main__':
-	train_x, train_y, test_x, test_y = create_feature_sets_and_labels('pos.txt', 'neg.txt')
-	with open('sentiment_set.pickle', 'wb') as f:
-		pickle.dump([train_x, train_y, test_x, test_y], f)
+	main()
